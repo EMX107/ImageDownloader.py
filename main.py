@@ -62,10 +62,11 @@ if __name__ == '__main__':
     query = input('what images you are looking for? ')
     n_images = int(input('how many images do you want? '))
 
-    time_stamp = str(int(time.time()))
-
     image_set = time_stamp + ' - ' + query
     search_url = ECOSIA_IMAGE + query.replace(' ', '+')
+
+    time_stamp = str(int(time.time()))
+    temp_file_path = IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png'
 
 
     # create save folders
@@ -75,8 +76,6 @@ if __name__ == '__main__':
         os.mkdir(IMAGE_SAVE_FOLDER)
     if not os.path.exists(IMAGE_SAVE_FOLDER + '\\' + image_set):
         os.mkdir(IMAGE_SAVE_FOLDER + '\\' + image_set)
-
-    temp_file_path = IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png'
     
 
     # get raw html
