@@ -6,7 +6,10 @@ import time
 import os
 
 
-GET_FULLSIZED_IMAGES = True
+ECOSIA_IMAGE = 'https://www.ecosia.org/images?q='
+HTML_SAVE_FOLDER = 'webpages'
+IMAGE_SAVE_FOLDER = 'images'
+GET_FULLSIZED_IMAGES = False
 
 USR_AGENT = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0',
@@ -16,10 +19,6 @@ USR_AGENT = {
     'Accept-Encoding': 'gzip, deflate',
     'Connection': 'keep-alive',
 }
-
-ECOSIA_IMAGE = 'https://www.ecosia.org/images?q='
-HTML_SAVE_FOLDER = 'webpages'
-IMAGE_SAVE_FOLDER = 'images'
 
 
 
@@ -76,6 +75,8 @@ if __name__ == '__main__':
         os.mkdir(IMAGE_SAVE_FOLDER)
     if not os.path.exists(IMAGE_SAVE_FOLDER + '\\' + image_set):
         os.mkdir(IMAGE_SAVE_FOLDER + '\\' + image_set)
+
+    temp_file_path = IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png'
     
 
     # get raw html
@@ -99,27 +100,29 @@ if __name__ == '__main__':
     img_count = 0
     for index, image_link in enumerate(image_links):
         if img_count < n_images:
+            # download the image
             image_binary = download_image(image_link)
             
+            # check if the download was successfull
             if not image_binary:
                 continue
-
-            with open(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png', 'wb') as temp_file:
+            with open(temp_file_path, 'wb') as temp_file:
                 temp_file.write(image_binary)
-            if image_is_corrupted(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png'):
+            if image_is_corrupted(temp_file_path):
                 continue
             
-            print(str(img_count) + '\t- ' +  image_link)
-
+            # save image
             with open(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\' + str(img_count) + '.png', 'wb') as image_file:
                 image_file.write(image_binary)
             
-            with open(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\' + image_set + '.info', 'a') as info_file:
+            # add image link to the info file
+            with open(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\' + 'info.txt', 'a') as info_file:
                 info_file.write(str(img_count) + '\t- ' + image_link + '\n')
             
+            print(str(img_count) + '\t- ' + image_link)
             img_count += 1
         else:
             break
     
-    os.remove(IMAGE_SAVE_FOLDER + '\\' + image_set + '\\temp.png')
+    os.remove(temp_file_path)
     print('\ndone.')
